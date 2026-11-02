@@ -1,0 +1,5 @@
+# What `composer require` installs: the library, its README and licence.
+/tests            export-ignore
+/phpunit.xml.dist export-ignore
+/.gitattributes   export-ignore
+/.gitignore       export-ignore

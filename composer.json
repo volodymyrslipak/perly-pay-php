@@ -1,0 +1,37 @@
+{
+    "name": "perly/perly-pay",
+    "description": "Perly Pay's PHP SDK: crypto payments straight to your wallet. Checkout sessions, invoices, payment links, refunds and webhook verification. No dependencies beyond ext-curl and ext-json.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["perly", "perly-pay", "payments", "crypto", "bitcoin", "usdc", "usdt", "stablecoin", "checkout", "webhooks", "non-custodial", "sdk"],
+    "homepage": "https://pay.perly.io/docs/sdks",
+    "support": {
+        "docs": "https://pay.perly.io/docs",
+        "source": "https://github.com/volodymyrslipak/perly-pay-php",
+        "issues": "https://github.com/volodymyrslipak/perly-pay-php/issues"
+    },
+    "authors": [
+        { "name": "Perly", "homepage": "https://pay.perly.io" }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "autoload": {
+        "psr-4": { "Perly\\Pay\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Perly\\Pay\\Tests\\": "tests/" }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}
