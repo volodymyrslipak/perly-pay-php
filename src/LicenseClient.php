@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Perly\Pay;
 
+use Perly\Pay\Exception\InvalidRequestException;
 use Perly\Pay\Http\CurlTransport;
 use Perly\Pay\Http\Requestor;
 use Perly\Pay\Http\Transport;
 
 /**
  * License checks from software you ship (a plugin, a desktop app): no
- * secret key, only the buyer's license key. Never ship a secret key.
+ * secret key, only the buyer's license key and your `product` (required:
+ * without it a key from another account could answer, so the API refuses
+ * the call, and so does this, before sending it). Never ship a secret key.
  *
  *   $result = (new LicenseClient())->activate(['key' => $key, 'product' => 'prod_…', 'instance_name' => gethostname()]);
  *   if (!$result['valid']) { … $result['reason'] … }
@@ -41,7 +44,7 @@ final class LicenseClient
      */
     public function validate(array $params): array
     {
-        return $this->requestor->request('POST', '/license_keys/validate', $params);
+        return $this->check('/license_keys/validate', $params);
     }
 
     /**
@@ -51,7 +54,7 @@ final class LicenseClient
      */
     public function activate(array $params): array
     {
-        return $this->requestor->request('POST', '/license_keys/activate', $params);
+        return $this->check('/license_keys/activate', $params);
     }
 
     /**
@@ -61,6 +64,25 @@ final class LicenseClient
      */
     public function deactivate(array $params): array
     {
-        return $this->requestor->request('POST', '/license_keys/deactivate', $params);
+        return $this->check('/license_keys/deactivate', $params);
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>
+     */
+    private function check(string $path, array $params): array
+    {
+        if (!isset($params['product']) || !is_string($params['product']) || $params['product'] === '') {
+            throw new InvalidRequestException(
+                "Pass `product` (your product's id, `prod_…`) with the license key: without it a key from another account could answer.",
+                'invalid_request_error',
+                'parameter_missing',
+                'product',
+            );
+        }
+
+        return $this->requestor->request('POST', $path, $params);
     }
 }

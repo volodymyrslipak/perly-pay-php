@@ -26,4 +26,18 @@ final class WebhookEndpoints extends AbstractResource
     {
         return $this->action($id, 'roll_secret', [], $options);
     }
+
+    /**
+     * Takes this endpoint's delivery of an event once: a second claim is refused with
+     * 409 `already_claimed`, an event never sent to this endpoint with 404 `not_delivered`.
+     *
+     * @param array{event: string} $params
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed> the event
+     */
+    public function claim(string $id, array $params, array $options = []): array
+    {
+        return $this->action($id, 'claim', $params, $options);
+    }
 }

@@ -37,7 +37,7 @@ use Perly\Pay\Resource\WebhookEndpoints;
  */
 final class PerlyPay
 {
-    public const VERSION = '0.1.0';
+    public const VERSION = '0.2.0';
     public const DEFAULT_BASE_URL = 'https://pay.perly.io';
 
     /** `test` for an sk_test_ key, `live` for sk_live_. */

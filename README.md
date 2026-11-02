@@ -106,7 +106,7 @@ every call is request options: `idempotency_key`, `max_retries`, `timeout` (seco
 | `credits` | `balance`, `consume`, `topUpUrl`, `usage` |
 | `licenseKeys` | `validate`, `activate`, `deactivate`, `retrieve`, `list`, `listAll`, `revoke` |
 | `portalSessions` | `create` |
-| `webhookEndpoints` | `create`, `retrieve`, `update`, `delete`, `list`, `listAll`, `rollSecret` |
+| `webhookEndpoints` | `create`, `retrieve`, `update`, `delete`, `list`, `listAll`, `rollSecret`, `claim` |
 
 ```php
 // Every page of a list
@@ -145,8 +145,9 @@ try {
 ### License keys from software you ship
 
 Never ship a secret key in a plugin or an app. `LicenseClient` calls the public
-license endpoints with the buyer's key and your `product` (always pass it: without
-it a key of any account may answer, live keys only unless `livemode` is false):
+license endpoints with the buyer's key and your `product`. `product` is required:
+without it the call is refused (`InvalidRequestException`, code `parameter_missing`),
+and a key of any other product or account answers `wrong_product`:
 
 ```php
 use Perly\Pay\LicenseClient;
@@ -162,7 +163,11 @@ if (!$result['valid']) {
 Every failure throws a `Perly\Pay\Exception\PerlyPayException`: `InvalidRequestException`,
 `AuthenticationException`, `PermissionException`, `RateLimitException`,
 `IdempotencyException`, `ApiException`, `ConnectionException`, and
-`SignatureVerificationException` for webhooks.
+`SignatureVerificationException` for webhooks. A call from a place Perly Pay
+can't be used (pay.perly.io/sanctions) is a `PermissionException` with code
+`region_blocked` and status 451, never retried. A key whose maker left the
+team, or may no longer manage keys, is revoked: `AuthenticationException`,
+`api_key_invalid`.
 
 ```php
 use Perly\Pay\Exception\InvalidRequestException;

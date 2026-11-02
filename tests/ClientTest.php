@@ -222,6 +222,28 @@ final class ClientTest extends TestCase
         self::assertArrayNotHasKey('Authorization', $t->calls[0]['headers']);
     }
 
+    public function testRefusesALicenseCheckWithoutAProductBeforeSendingIt(): void
+    {
+        $t = new FakeTransport([]);
+        $licenses = new LicenseClient(['base_url' => 'http://pay.test', 'transport' => $t]);
+        $calls = [
+            static fn () => $licenses->validate(['key' => 'K']),
+            static fn () => $licenses->activate(['key' => 'K', 'instance_name' => 'laptop']),
+            static fn () => $licenses->deactivate(['key' => 'K', 'product' => '', 'instance_name' => 'laptop']),
+        ];
+        foreach ($calls as $call) {
+            try {
+                $call();
+                self::fail('a license check without product was sent');
+            } catch (InvalidRequestException $e) {
+                self::assertSame('parameter_missing', $e->getErrorCode());
+                self::assertSame('product', $e->getParam());
+                self::assertStringContainsString('`product`', $e->getMessage());
+            }
+        }
+        self::assertSame([], $t->calls);
+    }
+
     public function testBacksOffExponentiallyWithJitter(): void
     {
         self::assertSame(250, Requestor::backoffMs(0, null, static fn (): float => 0.0));
